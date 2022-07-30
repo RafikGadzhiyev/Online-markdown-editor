@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import ReactMarkdown from "react-markdown";
+import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
 import styled from "styled-components"
+import { Files, IState } from '../../pages';
+import { ReduxStore } from '../redux/StoreType';
 import { Block } from "./Block";
+import { CreateFileModal } from './CreateFileModal';
+import { NoFilesModal } from './NoFIlesModal';
 
 const MainContainer = styled.main`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    width: 100vw;
+    min-height: 867px;
+    position: relative;
+    background-color: #15161a;
 `;
+
 
 const MarkDownWrapper = styled.div`
     height: 820px;
@@ -17,7 +26,7 @@ const MarkDownWrapper = styled.div`
 
 const PreviewWrapper = styled.div`
     color: white;
-    padding: .5rem 1rem;
+    padding: .5rem 2.5rem;
 `;
 
 const MarkDownField = styled.textarea`
@@ -27,32 +36,103 @@ const MarkDownField = styled.textarea`
     resize: none;
 `
 
-export const MarkDown: React.FC = () => {
-    const [state, setState] = React.useState<string>('');
+const PreviewViewer = styled.pre`
+    word-break: break-all;
+    white-space: pre-wrap;
+`
+
+
+interface IProps extends React.PropsWithChildren {
+    files: IState,
+    setIsCreateFileModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    isCreateFileModalOpen: boolean,
+    fileState: Files | null,
+    setFileState: React.Dispatch<React.SetStateAction<Files | null>>
+}
+
+export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, isCreateFileModalOpen, fileState, setFileState }) => {
+    const store: ReduxStore = useSelector((store: ReduxStore) => store);
+
+    const changeState = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        const element: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
+        if (store.currentFile && fileState) {
+            const newState: Files = {
+                ...fileState,
+                content: element.value
+            }
+            setFileState(() => newState)
+        }
+    }
+
+    const keyPressedHandler = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        let key: string = e.key;
+        if (key === 'Tab') {
+            e.preventDefault();
+            if (store.currentFile && fileState) {
+                const newState: Files = {
+                    ...fileState,
+                    content: fileState.content + '\t'
+                }
+                setFileState(() => newState)
+            }
+            return;
+        }
+    }
+
+    React.useEffect(() => {
+        for (let file of store.files) {
+            if (file.id === store.currentFile) {
+                setFileState(() => file);
+            }
+        }
+    }, [store.currentFile, store.files, setFileState])
 
     return <MainContainer>
-        <Block
-            name="Markdown"
-        >
-            <MarkDownWrapper>
-                <MarkDownField
-                    value={state}
-                    onChange={(e) => setState(() => e.target.value)}
-                />
-            </MarkDownWrapper>
-        </Block>
-        <Block
-            name="Preview"
-        >
-            <PreviewWrapper>
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
+        {
+            files.files.length === 0 && !isCreateFileModalOpen &&
+            <NoFilesModal
+                setIsModalOpen={setIsCreateFileModalOpen}
+            />
+        }
+        {
+            isCreateFileModalOpen &&
+            <CreateFileModal
+                setIsOpen={setIsCreateFileModalOpen}
+            />
+        }
+        {
+            store.currentFile && fileState &&
+            <>
+                <Block
+                    name="Markdown"
                 >
-                    {
-                        state
-                    }
-                </ReactMarkdown>
-            </PreviewWrapper>
-        </Block>
+                    <MarkDownWrapper>
+                        <MarkDownField
+                            value={fileState.content}
+                            onChange={(e) => changeState(e)}
+                            onKeyDown={(e) => keyPressedHandler(e)}
+                        />
+                    </MarkDownWrapper>
+                </Block>
+                {
+                    fileState.name.split('.')[1] === 'md' &&
+                    <Block
+                        name="Preview"
+                    >
+                        <PreviewWrapper>
+                            <PreviewViewer>
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                >
+                                    {
+                                        fileState.content
+                                    }
+                                </ReactMarkdown>
+                            </PreviewViewer>
+                        </PreviewWrapper>
+                    </Block>
+                }
+            </>
+        }
     </MainContainer>
 }

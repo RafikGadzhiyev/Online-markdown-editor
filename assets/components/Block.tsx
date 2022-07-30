@@ -9,6 +9,8 @@ interface IProps extends React.PropsWithChildren {
 const BlockContainer = styled.div`
     background-color: #15161a;
     height: 867px;
+    width: 100%;
+    word-break: break;
     color: #838488;
 
     &:not(:last-of-type){

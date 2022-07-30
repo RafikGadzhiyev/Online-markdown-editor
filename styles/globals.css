@@ -17,4 +17,5 @@ button,
 a{
   all: unset;
   cursor: pointer;
+  box-sizing: inherit;
 }

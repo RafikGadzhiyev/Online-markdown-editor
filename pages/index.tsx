@@ -1,9 +1,39 @@
+import React from 'react';
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { MainNavigation } from '../assets/components/MainNavigation'
 import { MarkDown } from '../assets/components/Markdown'
+import { useDispatch, useSelector } from 'react-redux';
+import { InitState } from '../assets/redux/actions/FileActions';
+import { ReduxStore } from '../assets/redux/StoreType';
+
+export interface IState {
+  files: Files[],
+}
+
+export type Files = {
+  name: string,
+  content: string,
+  createdAt: Date,
+  lastChanges: Date,
+  id: string
+}
 
 const Home: NextPage = () => {
+  const dispatch: React.Dispatch<any> = useDispatch();
+  const store: ReduxStore = useSelector((store: ReduxStore) => store);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+  const [fileState, setFileState] = React.useState<Files | null>(null);
+  const TOTAL_INIT = React.useRef(1);
+
+
+
+  React.useEffect(() => {
+    if (TOTAL_INIT.current) {
+      TOTAL_INIT.current--;
+      dispatch(InitState())
+    }
+  }, [dispatch])
 
   return (
     <div>
@@ -13,9 +43,19 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <MainNavigation />
+      <MainNavigation
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        fileState={fileState}
+      />
 
-      <MarkDown />
+      <MarkDown
+        files={store}
+        isCreateFileModalOpen={isModalOpen}
+        setIsCreateFileModalOpen={setIsModalOpen}
+        fileState={fileState}
+        setFileState={setFileState}
+      />
 
     </div>
   )

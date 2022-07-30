@@ -7,8 +7,8 @@ interface IProps extends React.PropsWithChildren {
 
 const BlockNameContainer = styled.div`
     background-color: #1e1f22;
-    width: 100%;
     padding: .5rem 1rem;
+    word-break: break-all;
 `;
 
 export const BlockName: React.FC<IProps> = ({ name }) => {
