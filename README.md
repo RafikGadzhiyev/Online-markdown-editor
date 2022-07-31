@@ -38,7 +38,7 @@ This is a test text whic You can use to see markdown:
 # Hello, world!
 ___
 
-This project contains a lof of functionality for human who loves work with letters and text
+# 🔴 This project contains a lof of functionality for human who loves work with letters and text 🔴
 
 # Little example:
 If you want to use italic text just use 
