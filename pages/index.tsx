@@ -4,7 +4,7 @@ import Head from 'next/head'
 import { MainNavigation } from '../assets/components/MainNavigation'
 import { MarkDown } from '../assets/components/Markdown'
 import { useDispatch, useSelector } from 'react-redux';
-import { InitState } from '../assets/redux/actions/FileActions';
+import { InitState, UpdateFileContent } from '../assets/redux/actions/FileActions';
 import { ReduxStore } from '../assets/redux/StoreType';
 
 export interface IState {
@@ -22,6 +22,7 @@ export type Files = {
 const Home: NextPage = () => {
   const dispatch: React.Dispatch<any> = useDispatch();
   const store: ReduxStore = useSelector((store: ReduxStore) => store);
+  const [isSaved, setIsSaved] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [fileState, setFileState] = React.useState<Files | null>(null);
   const TOTAL_INIT = React.useRef(1);

@@ -12,10 +12,14 @@ const BlockContainer = styled.div`
     width: 100%;
     word-break: break;
     color: #838488;
+    position: relative;
+    overflow: auto;
 
     &:not(:last-of-type){
         border-right: 2px solid #35383e;
     }
+
+
 
 `;
 

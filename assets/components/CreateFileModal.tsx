@@ -13,6 +13,7 @@ const CreateFileModalContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 99;
 `;
 const CreateFileModalWrapper = styled.div`
     background-color: #35383E;

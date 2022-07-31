@@ -1,9 +1,21 @@
 import React, { ChangeEvent } from 'react';
 import ReactMarkdown from "react-markdown";
-import { useSelector } from 'react-redux';
+// HighLight
+import { PrismLight as SyntaxHighLighter } from 'react-syntax-highlighter'
+import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx'
+import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript'
+import scss from 'react-syntax-highlighter/dist/cjs/languages/prism/scss'
+import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown'
+import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json'
+import cpp from 'react-syntax-highlighter/dist/cjs/languages/prism/cpp'
+import rangeParser from 'parse-numeric-range'
+import { atomDark as darkTheme } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+//Redux
+import { useDispatch, useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
 import styled from "styled-components"
 import { Files, IState } from '../../pages';
+import { UpdateFileContent } from '../redux/actions/FileActions';
 import { ReduxStore } from '../redux/StoreType';
 import { Block } from "./Block";
 import { CreateFileModal } from './CreateFileModal';
@@ -26,7 +38,7 @@ const MarkDownWrapper = styled.div`
 
 const PreviewWrapper = styled.div`
     color: white;
-    padding: .5rem 2.5rem;
+    padding: .5rem 1rem;
 `;
 
 const MarkDownField = styled.textarea`
@@ -39,6 +51,27 @@ const MarkDownField = styled.textarea`
 const PreviewViewer = styled.pre`
     word-break: break-all;
     white-space: pre-wrap;
+
+    a{
+        text-decoration: underline;
+
+        &:hover{
+            color: #ccc;
+        }
+
+    }
+
+    ul,ol{
+        padding-left: 1.5rem;
+    }
+
+    code{
+        background: #2C2D30;
+        padding: .5rem 1rem;
+        display: block;
+        margin-block: 1rem;
+    }
+
 `
 
 
@@ -50,8 +83,59 @@ interface IProps extends React.PropsWithChildren {
     setFileState: React.Dispatch<React.SetStateAction<Files | null>>
 }
 
+// Registering markdwon styles 
+SyntaxHighLighter.registerLanguage('tsx', tsx)
+SyntaxHighLighter.registerLanguage('typescript', typescript)
+SyntaxHighLighter.registerLanguage('scss', scss)
+SyntaxHighLighter.registerLanguage('json', json)
+SyntaxHighLighter.registerLanguage('markdown', markdown)
+SyntaxHighLighter.registerLanguage('c++', cpp)
+
 export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, isCreateFileModalOpen, fileState, setFileState }) => {
     const store: ReduxStore = useSelector((store: ReduxStore) => store);
+    const dispatch: React.Dispatch<any> = useDispatch();
+
+    // Creating hightlight data object 
+    const MarkdownComponents: object = {
+        code({ node, inline, className, ...props }: any) {
+            const syntaxTheme = darkTheme;
+            const match = /language-(\w+)/.exec(className || '')
+            const hasMeta = node?.data?.meta
+
+            const applyHighlights: object = (applyHighlights: number) => {
+                if (hasMeta) {
+                    const RE = /{([\d,-]+)}/
+                    const metadata = node.data.meta?.replace(/\s/g, '')
+                    const strlineNumbers = RE?.test(metadata)
+                        ? (RE?.exec(metadata) || ['', ''])[1]
+                        : '0'
+                    const highlightLines = rangeParser(strlineNumbers)
+                    const highlight = highlightLines
+                    const data: string = highlight.includes(applyHighlights)
+                        ? 'highlight'
+                        : ''
+                    return { data }
+                } else {
+                    return {}
+                }
+            }
+            return match ? (
+                <SyntaxHighLighter
+                    style={syntaxTheme}
+                    language={match[1]}
+                    PreTag="div"
+                    className="codeStyle"
+                    showLineNumbers={true}
+                    wrapLines={hasMeta ? true : false}
+                    useInlineStyles={true}
+                    lineProps={applyHighlights}
+                    {...props}
+                />
+            ) : (
+                <code className={className} {...props} />
+            )
+        },
+    }
 
     const changeState = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const element: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
@@ -69,13 +153,23 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
         if (key === 'Tab') {
             e.preventDefault();
             if (store.currentFile && fileState) {
+                let selectionStart = e.target.selectionStart,
+                    selectionEnd = e.target.selectionEnd;
                 const newState: Files = {
                     ...fileState,
-                    content: fileState.content + '\t'
+                    content: fileState.content.substring(0, selectionStart) + '\t' + fileState.content.substring(selectionEnd)
                 }
                 setFileState(() => newState)
             }
             return;
+        }
+        if (key === 's' && e.ctrlKey) {
+            if (fileState) {
+                e.preventDefault();
+                dispatch(UpdateFileContent(store.currentFile, fileState.content))
+                alert("Saved");
+                return false;
+            }
         }
     }
 
@@ -86,6 +180,8 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
             }
         }
     }, [store.currentFile, store.files, setFileState])
+
+
 
     return <MainContainer>
         {
@@ -123,6 +219,7 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
                             <PreviewViewer>
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm]}
+                                    components={MarkdownComponents}
                                 >
                                     {
                                         fileState.content
@@ -134,5 +231,6 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
                 }
             </>
         }
+
     </MainContainer>
 }

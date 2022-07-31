@@ -32,3 +32,68 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+This is a test text whic You can use to see markdown:
+
+# Hello, world!
+___
+
+This project contains a lof of functionality for human who loves work with letters and text
+
+# Little example:
+If you want to use italic text just use 
+```markdown
+*write text here*
+```
+If you want to use bold text just use 
+```markdown
+**write text here**
+```
+If you want to use italic + bold text just use 
+```markdown
+***write text here***
+```
+
+If you want to use more complex thing such as link here you are:
+
+[Link to this page](http://localhost:3000)
+
+1. List
+2. Another list
+* Item
+    1. First Subitem
+    2. Second Subitem
+
+```ts	
+// let's write factorial function 
+
+const factorial = (n: number): number => {
+	return n === 1 ? 0 : n * factorial(n - 1);
+}
+
+interface IProps extends React.PropsWithChildren {
+    total: number,
+    usage: {
+        last_time: Date,
+        today: null | Date
+    }
+}
+
+```
+
+```tsx
+const [state, setState] = React.useState<number>(0);
+React.useEffect(() => {
+   console.log("Hello, World!");
+}, [])
+```
+
+```java
+package package_name;
+
+class Main {
+    public static void main(string argv[]){
+        System.out.println("Hello, world!");
+    }
+}
+```

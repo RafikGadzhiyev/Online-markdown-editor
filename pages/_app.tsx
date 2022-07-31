@@ -3,9 +3,11 @@ import '../styles/globals.css'
 import { Provider } from 'react-redux'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { store } from '../assets/redux/store'
+import React from 'react'
 
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) { 
+
   return <Provider
     store={store}
   >
