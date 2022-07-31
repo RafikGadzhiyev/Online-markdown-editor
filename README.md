@@ -33,12 +33,10 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-This is a test text whic You can use to see markdown:
+# 🔴 This is a test text whic You can use to see markdown 🔴:
 
 # Hello, world!
 ___
-
-# 🔴 This project contains a lof of functionality for human who loves work with letters and text 🔴
 
 # Little example:
 If you want to use italic text just use 
