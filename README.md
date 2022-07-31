@@ -33,7 +33,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-# 🔴 This is a test text whic You can use to see markdown 🔴:
+# 🔴 This is a test text which You can use to see markdown 🔴:
 
 # Hello, world!
 ___
