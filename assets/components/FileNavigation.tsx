@@ -1,20 +1,27 @@
+// Libraries and framewords
 import React from 'react';
 import styled, { StyledComponent } from 'styled-components';
-import { Files, IState } from '../../pages';
 import { v4 as uuid4 } from 'uuid';
-import { CreateFileButton } from '../elements/CreateFileButton';
-import { ReduxStore } from '../redux/StoreType';
+// Hooks
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectFile } from '../redux/actions/FileActions';
+// Components and elements
+import { CreateFileButton } from '../elements/CreateFileButton';
+// Types
+import type { File } from '../../pages';
+import type { RootState } from '../redux/store';
+// Actions
+import { selectFile } from './../redux/slices/FileActions.slice';
 
+// Components customg Attributes
+type FileNavigationContainerAttributes = {
+    isOpen: boolean;
+}
+
+// Local styled components
 const CloseButton = styled.button`
     align-self: flex-end;
     font-size: 1.5rem;
 `;
-
-type FileNavigationContainerAttributes = {
-    isOpen: boolean;
-}
 
 const FileNavigationContainer: StyledComponent<'nav', any, FileNavigationContainerAttributes, never> = styled.nav`
     width: 100%;
@@ -72,7 +79,7 @@ export const FileNavigation: React.FC<IProps> = ({
     setIsOpen,
     setIsModalOpen
 }) => {
-    const store: ReduxStore = useSelector((store: ReduxStore) => store);
+    const store: RootState = useSelector((store: RootState) => store);
     const dispatch: React.Dispatch<any> = useDispatch();
 
     const CloseHandler = (e: React.SyntheticEvent) => {
@@ -84,9 +91,9 @@ export const FileNavigation: React.FC<IProps> = ({
     const chooseFile = (e: React.SyntheticEvent) => {
         const element: HTMLButtonElement = e.target as HTMLButtonElement;
 
-        for (let file of store.files) {
+        for (let file of store.fileSlice.data.files) {
             if (file.id === element.dataset.fileid) {
-                dispatch(SelectFile(file.id))
+                dispatch(selectFile(file.id))
             }
         }
 
@@ -106,13 +113,13 @@ export const FileNavigation: React.FC<IProps> = ({
             </CloseButton>
             <FilesList>
                 {
-                    store.files.map((e: Files) => <File
+                    store.fileSlice.data.files.map((e: File) => <File
                         key={uuid4()}
                     >
                         <ChooseFileButton
                             data-fileid={e.id}
                             onClick={(e) => chooseFile(e)}
-                            className={store.currentFile === e.id ? 'chosen' : ''}
+                            className={store.fileSlice.data.currentFile === e.id ? 'chosen' : ''}
                         >
                             {e.name}
                         </ChooseFileButton>

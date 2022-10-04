@@ -11,6 +11,8 @@
   "dependencies": {
     "@mui/material": "^5.9.2",
     "@mui/styled-engine-sc": "^5.8.0",
+    "@react-pdf/renderer": "^3.0.0",
+    "@reduxjs/toolkit": "^1.8.5",
     "antd": "^4.22.2",
     "bootstrap-icons": "^1.9.1",
     "next": "12.2.3",

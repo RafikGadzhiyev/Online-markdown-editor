@@ -1,11 +1,20 @@
+// Libraries and frameworks
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Files } from '../../pages';
-import { DeleteFile, SelectFile, UpdateFileContent } from '../redux/actions/FileActions';
-import { ReduxStore } from '../redux/StoreType';
+import { PDFDownloadLink, Document, Page, Text, View } from '@react-pdf/renderer';
+// Hooks
+import { useSelector, useDispatch } from 'react-redux';
+// Types
+import type { File } from '../../pages';
+import type { RootState } from '../redux/store';
+// Actions
+import { updateFile, deleteFile, selectFile } from './../redux/slices/FileActions.slice'
+// Components
 import { FileNavigation } from './FileNavigation';
+import remarkGfm from 'remark-gfm';
+import ReactMarkdown from 'react-markdown';
 
+// Local styled components
 const NavigationContainer = styled.header`
     width: 100%;
     height: 3.5rem;
@@ -76,39 +85,76 @@ const SaveButton = styled.button`
     gap: .5rem;
 `;
 
+const DownloadButton = styled.button`
+    transition: 300ms ease;
+
+    &:hover{
+        color: yellowgreen;
+    }
+
+`;
+
+
+
 interface IProps extends React.PropsWithChildren {
     isOpen: boolean,
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    fileState: Files | null,
+    fileState: File | null,
 }
 
 export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState }) => {
     const [isFileNavigationOpen, setIsFileNavigationOpen] = React.useState<boolean>(false);
-    const store: ReduxStore = useSelector((store: ReduxStore) => store);
+    const store: RootState = useSelector((store: RootState) => store);
     const dispatch: React.Dispatch<any> = useDispatch();
-    const chosenFile = React.useRef<Files | null>(null);
+    const chosenFile = React.useRef<File | null>(null);
+
+    //! Test zone
+    const MainDocument = () => {
+        return <Document>
+            <Page size='A4'>
+                <View
+                    render={() => {
+                        let fileData;
+                        for (let file of store.fileSlice.data.files) {
+                            if (file.id === store.fileSlice.data.currentFile) {
+                                fileData = file.content
+                            }
+                        }
+
+                        return <Text>{
+                            fileData
+                        }</Text>
+                    }}
+                >
+
+                </View>
+
+            </Page>
+        </Document>
+    }
+    //! Test zone
 
     React.useEffect(() => {
-        for (let file of store.files) {
-            if (file.id === store.currentFile) {
+        for (let file of store.fileSlice.data.files) {
+            if (file.id === store.fileSlice.data.currentFile) {
                 chosenFile.current = file;
             }
         }
     }, [store])
 
-    const saveFileContent = () => {
+    const saveFileContentHandler = () => {
         if (fileState) {
-            dispatch(UpdateFileContent(store.currentFile, fileState.content));
+            dispatch(updateFile({ id: store.fileSlice.data.currentFile, content: fileState.content }));
             alert("Saved!");
         }
     }
 
-    const deleteFile = () => {
+    const deleteFileHandler = () => {
         if (fileState) {
-            dispatch(DeleteFile(fileState.id));
+            dispatch(deleteFile(fileState.id));
             alert('Deleted!')
-            if (store.files.length) {
-                dispatch(SelectFile(store.files[0].id))
+            if (store.fileSlice.data.files.length) {
+                dispatch(selectFile(store.fileSlice.data.files[0].id))
             }
         }
     }
@@ -129,7 +175,7 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
                 </OpenMenuButton>
                 <AppName>MarkDown</AppName>
                 {
-                    store.currentFile && chosenFile.current &&
+                    store.fileSlice.data.currentFile && chosenFile.current &&
                     <DocumentDataContainer>
                         <i className="bi bi-file-earmark"></i>
                         <DocumentDataWrapper>
@@ -140,18 +186,27 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
                 }
             </NavigationLeftSideContainer>
             {
-                store.currentFile && chosenFile.current &&
+                store.fileSlice.data.currentFile && chosenFile.current &&
                 <NavigationRightSideContainer>
                     <DeleteButton
-                        onClick={() => deleteFile()}
+                        onClick={() => deleteFileHandler()}
                     >
                         <i className="bi bi-trash"></i>
                     </DeleteButton>
                     <SaveButton
-                        onClick={() => saveFileContent()}
+                        onClick={() => saveFileContentHandler()}
                     >
                         <i className="bi bi-hdd"></i>
-                        Save changes</SaveButton>
+                        Save changes
+                    </SaveButton>
+                    <PDFDownloadLink document={<MainDocument />} fileName={`${store.fileSlice.data.currentFile}.pdf`}>
+                        {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' : 'Download now!'
+                        }
+                    </PDFDownloadLink>
+                    {/* <DownloadButton>
+                        Download file
+                    </DownloadButton> */}
                 </NavigationRightSideContainer>
             }
         </NavigationContainer>

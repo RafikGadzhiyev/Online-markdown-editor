@@ -1,5 +1,7 @@
+// Libraries and frameworks
 import React, { ChangeEvent } from 'react';
 import ReactMarkdown from "react-markdown";
+import styled from "styled-components"
 // HighLight
 import { PrismLight as SyntaxHighLighter } from 'react-syntax-highlighter'
 import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx'
@@ -10,17 +12,20 @@ import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json'
 import cpp from 'react-syntax-highlighter/dist/cjs/languages/prism/cpp'
 import rangeParser from 'parse-numeric-range'
 import { atomDark as darkTheme } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-//Redux
-import { useDispatch, useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
-import styled from "styled-components"
-import { Files, IState } from '../../pages';
-import { UpdateFileContent } from '../redux/actions/FileActions';
-import { ReduxStore } from '../redux/StoreType';
+//Hooks
+import { useDispatch, useSelector } from 'react-redux';
+// Types
+import type { File, IState } from '../../pages';
+import type { RootState } from '../redux/store';
+// Actions
+import { updateFile } from './../redux/slices/FileActions.slice'
+// Components
 import { Block } from "./Block";
 import { CreateFileModal } from './CreateFileModal';
 import { NoFilesModal } from './NoFIlesModal';
 
+// Local styled components
 const MainContainer = styled.main`
     display: flex;
     width: 100vw;
@@ -74,13 +79,12 @@ const PreviewViewer = styled.pre`
 
 `
 
-
+// Local Interface
 interface IProps extends React.PropsWithChildren {
-    files: IState,
     setIsCreateFileModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
     isCreateFileModalOpen: boolean,
-    fileState: Files | null,
-    setFileState: React.Dispatch<React.SetStateAction<Files | null>>
+    fileState: File | null,
+    setFileState: React.Dispatch<React.SetStateAction<File | null>>
 }
 
 // Registering markdwon styles 
@@ -91,8 +95,8 @@ SyntaxHighLighter.registerLanguage('json', json)
 SyntaxHighLighter.registerLanguage('markdown', markdown)
 SyntaxHighLighter.registerLanguage('c++', cpp)
 
-export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, isCreateFileModalOpen, fileState, setFileState }) => {
-    const store: ReduxStore = useSelector((store: ReduxStore) => store);
+export const MarkDown: React.FC<IProps> = ({ setIsCreateFileModalOpen, isCreateFileModalOpen, fileState, setFileState }) => {
+    const store: RootState = useSelector((store: RootState) => store);
     const dispatch: React.Dispatch<any> = useDispatch();
 
     // Creating hightlight data object 
@@ -139,12 +143,11 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
 
     const changeState = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const element: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
-        if (store.currentFile && fileState) {
-            const newState: Files = {
+        if (store.fileSlice.data.currentFile && fileState) {
+            setFileState(() => ({
                 ...fileState,
                 content: element.value
-            }
-            setFileState(() => newState)
+            }))
         }
     }
 
@@ -152,10 +155,10 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
         let key: string = e.key;
         if (key === 'Tab') {
             e.preventDefault();
-            if (store.currentFile && fileState) {
+            if (store.fileSlice.data.currentFile && fileState) {
                 let selectionStart = e.target.selectionStart,
                     selectionEnd = e.target.selectionEnd;
-                const newState: Files = {
+                const newState: File = {
                     ...fileState,
                     content: fileState.content.substring(0, selectionStart) + '\t' + fileState.content.substring(selectionEnd)
                 }
@@ -166,7 +169,7 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
         if (key === 's' && e.ctrlKey) {
             if (fileState) {
                 e.preventDefault();
-                dispatch(UpdateFileContent(store.currentFile, fileState.content))
+                dispatch(updateFile({ id: store.fileSlice.data.currentFile, content: fileState.content }))
                 alert("Saved");
                 return false;
             }
@@ -174,18 +177,18 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
     }
 
     React.useEffect(() => {
-        for (let file of store.files) {
-            if (file.id === store.currentFile) {
+        for (let file of store.fileSlice.data.files) {
+            if (file.id === store.fileSlice.data.currentFile) {
                 setFileState(() => file);
             }
         }
-    }, [store.currentFile, store.files, setFileState])
+    }, [store.fileSlice.data.currentFile, store.fileSlice.data.files, setFileState])
 
 
 
     return <MainContainer>
         {
-            files.files.length === 0 && !isCreateFileModalOpen &&
+            store.fileSlice.data.files.length === 0 && !isCreateFileModalOpen &&
             <NoFilesModal
                 setIsModalOpen={setIsCreateFileModalOpen}
             />
@@ -197,7 +200,7 @@ export const MarkDown: React.FC<IProps> = ({ files, setIsCreateFileModalOpen, is
             />
         }
         {
-            store.currentFile && fileState &&
+            store.fileSlice.data.currentFile && fileState &&
             <>
                 <Block
                     name="Markdown"

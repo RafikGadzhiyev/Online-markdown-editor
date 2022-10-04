@@ -1,9 +1,15 @@
+// Libraries and frameworks
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { v4 as uuid4 } from 'uuid';
-import { Files, IState } from '../../pages';
-import { CreateFile, SelectFile } from '../redux/actions/FileActions';
+// Hooks
+import { useDispatch } from 'react-redux';
+// Types
+import type { File } from '../../pages';
+// Actions
+import { createFile, selectFile } from './../redux/slices/FileActions.slice'
+
+// Local styled components
 
 const CreateFileModalContainer = styled.div`
     position: absolute;
@@ -115,7 +121,7 @@ export const CreateFileModal: React.FC<IProps> = ({ setIsOpen }) => {
 
         const NEW_FILE_ID = uuid4();
 
-        const newFile: Files = {
+        const newFile: File = {
             name: fileState.filename + '.' + fileState.extension,
             content: '',
             createdAt: new Date(Date.now()),
@@ -123,8 +129,8 @@ export const CreateFileModal: React.FC<IProps> = ({ setIsOpen }) => {
             id: NEW_FILE_ID
         }
 
-        dispatch(CreateFile(newFile));
-        dispatch(SelectFile(NEW_FILE_ID))
+        dispatch(createFile(newFile));
+        dispatch(selectFile(NEW_FILE_ID))
 
         setIsOpen(() => false)
     }

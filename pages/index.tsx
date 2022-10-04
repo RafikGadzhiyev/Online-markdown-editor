@@ -4,14 +4,15 @@ import Head from 'next/head'
 import { MainNavigation } from '../assets/components/MainNavigation'
 import { MarkDown } from '../assets/components/Markdown'
 import { useDispatch, useSelector } from 'react-redux';
-import { InitState, UpdateFileContent } from '../assets/redux/actions/FileActions';
+import { initializeFileData } from './../assets/redux/slices/FileActions.slice'
 import { ReduxStore } from '../assets/redux/StoreType';
+import { RootState } from '../assets/redux/store';
 
 export interface IState {
-  files: Files[],
+  files: File[],
 }
 
-export type Files = {
+export type File = {
   name: string,
   content: string,
   createdAt: Date,
@@ -21,10 +22,10 @@ export type Files = {
 
 const Home: NextPage = () => {
   const dispatch: React.Dispatch<any> = useDispatch();
-  const store: ReduxStore = useSelector((store: ReduxStore) => store);
+  const store: RootState = useSelector((store: RootState) => store);
   const [isSaved, setIsSaved] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
-  const [fileState, setFileState] = React.useState<Files | null>(null);
+  const [fileState, setFileState] = React.useState<File | null>(null);
   const TOTAL_INIT = React.useRef(1);
 
 
@@ -32,7 +33,7 @@ const Home: NextPage = () => {
   React.useEffect(() => {
     if (TOTAL_INIT.current) {
       TOTAL_INIT.current--;
-      dispatch(InitState())
+      dispatch(initializeFileData())
     }
   }, [dispatch])
 
@@ -51,7 +52,6 @@ const Home: NextPage = () => {
       />
 
       <MarkDown
-        files={store}
         isCreateFileModalOpen={isModalOpen}
         setIsCreateFileModalOpen={setIsModalOpen}
         fileState={fileState}

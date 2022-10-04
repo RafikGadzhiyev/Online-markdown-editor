@@ -1,7 +1,10 @@
-import { CreateFileButton } from "../elements/CreateFileButton"
-import styled from 'styled-components';
+// Libraries and frameworks
 import React from "react";
+import styled from 'styled-components';
+// Components and elements
+import { CreateFileButton } from "../elements/CreateFileButton"
 
+// Local styled components
 const CreateFileModalContainer = styled.div`
     position: absolute;
     width: 100%;

@@ -1,6 +1,6 @@
-import { Files } from "../../pages"
+import { File } from "../../pages"
 
 export type ReduxStore = {
-    files: Files[],
+    files: File[],
     currentFile: string // will contain a file id
 }

@@ -1,11 +1,15 @@
+// Libraries and frameworks
 import React from 'react';
-import { BlockName } from '../elements/BlockName';
 import styled from 'styled-components'
+// Components
+import { BlockName } from '../elements/BlockName';
 
+// Local Interfaces
 interface IProps extends React.PropsWithChildren {
     name: string
 }
 
+// Local styled components
 const BlockContainer = styled.div`
     background-color: #15161a;
     height: 867px;
