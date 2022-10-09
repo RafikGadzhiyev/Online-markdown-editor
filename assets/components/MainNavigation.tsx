@@ -155,7 +155,9 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
                 //     }</Text>
                 // }}
                 >
-                    This is beta version of pdf file. This functionality will work good as soon as possible. Best regards, developer
+                    <Text>
+                        This is beta version of pdf file. This functionality will work good as soon as possible. Best regards, developer
+                    </Text>
                 </View>
                 <View
                     style={StylesSheets.textSection}
