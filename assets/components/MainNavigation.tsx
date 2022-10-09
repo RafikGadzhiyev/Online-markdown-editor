@@ -107,8 +107,8 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
     const chosenFile = React.useRef<File | null>(null);
 
     //! Test zone
-    // TODO: create stylesheet for pdf file 
-    // TODO: creating link only when file was saved
+    // TODO: create beautiful stylesheet for pdf file 
+    // TODO: creating link only when file saved
     const StylesSheets = StyleSheet.create({
         page: {
             display: 'flex',
@@ -142,22 +142,20 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
             >
                 <View
                     style={StylesSheets.topSection}
-                    render={() => {
-                        let fileData;
-                        for (let file of store.fileSlice.data.files) {
-                            if (file.id === store.fileSlice.data.currentFile) {
-                                fileData = file.name
-                            }
-                        }
+                // render={() => {
+                //     let fileData;
+                //     for (let file of store.fileSlice.data.files) {
+                //         if (file.id === store.fileSlice.data.currentFile) {
+                //             fileData = file.name
+                //         }
+                //     }
 
-                        return <Text>{
-                            fileData
-                        }</Text>
-                    }}
+                //     return <Text>{
+                //         fileData
+                //     }</Text>
+                // }}
                 >
-                    {
-
-                    }
+                    This is beta version of pdf file. This functionality will work good as soon as possible. {\n} Best regards, developer
                 </View>
                 <View
                     style={StylesSheets.textSection}
