@@ -1,7 +1,7 @@
 // Libraries and frameworks
 import React from 'react';
 import styled from 'styled-components';
-import { PDFDownloadLink, Document, Page, Text, View } from '@react-pdf/renderer';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 // Hooks
 import { useSelector, useDispatch } from 'react-redux';
 // Types
@@ -11,8 +11,6 @@ import type { RootState } from '../redux/store';
 import { updateFile, deleteFile, selectFile } from './../redux/slices/FileActions.slice'
 // Components
 import { FileNavigation } from './FileNavigation';
-import remarkGfm from 'remark-gfm';
-import ReactMarkdown from 'react-markdown';
 
 // Local styled components
 const NavigationContainer = styled.header`
@@ -109,10 +107,60 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
     const chosenFile = React.useRef<File | null>(null);
 
     //! Test zone
+    // TODO: create stylesheet for pdf file 
+    // TODO: creating link only when file was saved
+    const StylesSheets = StyleSheet.create({
+        page: {
+            display: 'flex',
+            flexDirection: 'column',
+        },
+        topSection: {
+            width: '100%',
+            backgroundColor: '#FFA191',
+            padding: '25px 15px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        textSection: {
+            width: '100%',
+            backgroundColor: '#FFE0DA',
+            padding: '10px 15px',
+        },
+        textContent: {
+            textAlign: 'justify',
+            fontSize: '14px',
+            lineHeight: '25px'
+        }
+    })
+
     const MainDocument = () => {
         return <Document>
-            <Page size='A4'>
+            <Page
+                size='A4'
+                style={StylesSheets.page}
+            >
                 <View
+                    style={StylesSheets.topSection}
+                    render={() => {
+                        let fileData;
+                        for (let file of store.fileSlice.data.files) {
+                            if (file.id === store.fileSlice.data.currentFile) {
+                                fileData = file.name
+                            }
+                        }
+
+                        return <Text>{
+                            fileData
+                        }</Text>
+                    }}
+                >
+                    {
+
+                    }
+                </View>
+                <View
+                    style={StylesSheets.textSection}
                     render={() => {
                         let fileData;
                         for (let file of store.fileSlice.data.files) {
@@ -121,9 +169,11 @@ export const MainNavigation: React.FC<IProps> = ({ isOpen, setIsOpen, fileState 
                             }
                         }
 
-                        return <Text>{
-                            fileData
-                        }</Text>
+                        return <Text
+                            style={StylesSheets.textContent}
+                        >{
+                                fileData
+                            }</Text>
                     }}
                 >
 

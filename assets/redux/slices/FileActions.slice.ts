@@ -23,7 +23,7 @@ const FileActionsSlice = createSlice({
         initializeFileData(store) {
             const initializedFileData: IState = {
                 data: getDataFromLocalStorage() || {
-                    File: [],
+                    files: [],
                     currentFile: ''
                 }
             }

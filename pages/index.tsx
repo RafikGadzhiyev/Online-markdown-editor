@@ -5,7 +5,6 @@ import { MainNavigation } from '../assets/components/MainNavigation'
 import { MarkDown } from '../assets/components/Markdown'
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeFileData } from './../assets/redux/slices/FileActions.slice'
-import { ReduxStore } from '../assets/redux/StoreType';
 import { RootState } from '../assets/redux/store';
 
 export interface IState {
@@ -22,8 +21,6 @@ export type File = {
 
 const Home: NextPage = () => {
   const dispatch: React.Dispatch<any> = useDispatch();
-  const store: RootState = useSelector((store: RootState) => store);
-  const [isSaved, setIsSaved] = React.useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [fileState, setFileState] = React.useState<File | null>(null);
   const TOTAL_INIT = React.useRef(1);
