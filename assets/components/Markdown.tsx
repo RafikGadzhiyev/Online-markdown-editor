@@ -28,7 +28,7 @@ import { NoFilesModal } from './NoFIlesModal';
 // Local styled components
 const MainContainer = styled.main`
     display: flex;
-    width: 100vw;
+    width: 100%;
     min-height: 867px;
     position: relative;
     background-color: #15161a;
